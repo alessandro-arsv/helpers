@@ -1,58 +1,66 @@
+--[[
+    Usage:
+    local Notify = loadstring(game:HttpGet("https://raw.githubusercontent.com/alessandro-arsv/helpers/refs/heads/main/notficiation"))()
+    Notify("Title", "Message here", "Success", 5)
+]]
 
 local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
 local Debris = game:GetService("Debris")
 
-local Settings = {
-    Icons = {
-        Error   = "rbxassetid://5107154082",
-        Success = "rbxassetid://8266856324",
-        Warning = "rbxassetid://85147473315465"
-    },
-    Colors = {
-        Error   = Color3.fromRGB(255, 108, 108),
-        Success = Color3.fromRGB(120, 255, 169),
-        Warning = Color3.fromRGB(255, 210, 116),
-        Default = Color3.fromRGB(0, 170, 255)
-    },
-    Font = Enum.Font.GothamMedium,
-    BoldFont = Enum.Font.GothamBold
+-- Configuration & Theme
+local Icons = {
+    Error = "rbxassetid://5107154082",
+    Success = "rbxassetid://8266856324",
+    Warning = "rbxassetid://85147473315465"
 }
 
+local Colors = {
+    Error = Color3.fromRGB(255, 85, 85),
+    Success = Color3.fromRGB(85, 255, 150),
+    Warning = Color3.fromRGB(255, 180, 80),
+    Default = Color3.fromRGB(0, 170, 255)
+}
+
+-- UI Container
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "LuauX_Notifications"
+ScreenGui.Name = "LuauX_Helper_Notifs"
 ScreenGui.Parent = CoreGui
 ScreenGui.DisplayOrder = 999
+ScreenGui.ResetOnSpawn = false
 
 local Holder = Instance.new("Frame")
 Holder.Name = "Holder"
 Holder.Size = UDim2.new(0, 320, 1, -40)
-Holder.Position = UDim2.new(1, -20, 1, -20)
+Holder.Position = UDim2.new(1, -15, 1, -15)
 Holder.AnchorPoint = Vector2.new(1, 1)
 Holder.BackgroundTransparency = 1
 Holder.Parent = ScreenGui
 
 local UIListLayout = Instance.new("UIListLayout")
-UIListLayout.Padding = UDim.new(0, 10)
+UIListLayout.Padding = UDim.new(0, 8)
 UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
 UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 UIListLayout.Parent = Holder
 
-local function Notify(title, msg, type, duration)
+-- Core Function
+local function CreateNotification(title, msg, type, duration)
     title = title or "SYSTEM"
     msg = msg or ""
     type = type or "Success"
     duration = duration or 5
-    local accentColor = Settings.Colors[type] or Settings.Colors.Default
+    local accentColor = Colors[type] or Colors.Default
 
+    -- Main Container
     local Notif = Instance.new("Frame")
+    Notif.Name = "Notification"
     Notif.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
     Notif.BackgroundTransparency = 0.1
     Notif.BorderSizePixel = 0
     Notif.ClipsDescendants = true
-    Notif.Size = UDim2.new(0, 300, 0, 0) -- Start at 0 for pop animation
-    Notif.LayoutOrder = -os.clock() * 1000
+    Notif.Size = UDim2.new(0, 300, 0, 0) -- Start at 0 for pop-in
+    Notif.LayoutOrder = -os.clock() * 1000 -- Precise stacking
     Notif.Parent = Holder
 
     local UICorner = Instance.new("UICorner")
@@ -65,33 +73,33 @@ local function Notify(title, msg, type, duration)
     UIStroke.Transparency = 0.5
     UIStroke.Parent = Notif
 
+    -- Visual Elements
     local Icon = Instance.new("ImageLabel")
-    Icon.Name = "Icon"
     Icon.Size = UDim2.new(0, 26, 0, 26)
     Icon.Position = UDim2.new(0, 12, 0, 12)
     Icon.BackgroundTransparency = 1
-    Icon.Image = Settings.Icons[type] or Settings.Icons.Success
+    Icon.Image = Icons[type] or Icons.Success
     Icon.ImageColor3 = accentColor
     Icon.Parent = Notif
 
     local TitleLabel = Instance.new("TextLabel")
     TitleLabel.Size = UDim2.new(1, -60, 0, 20)
-    TitleLabel.Position = UDim2.new(0, 50, 0, 10)
+    TitleLabel.Position = UDim2.new(0, 48, 0, 10)
     TitleLabel.BackgroundTransparency = 1
     TitleLabel.Text = title:upper()
     TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    TitleLabel.Font = Settings.BoldFont
+    TitleLabel.Font = Enum.Font.GothamBold
     TitleLabel.TextSize = 14
     TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     TitleLabel.Parent = Notif
 
     local DescLabel = Instance.new("TextLabel")
-    DescLabel.Size = UDim2.new(1, -60, 0, 0) -- Auto-height
-    DescLabel.Position = UDim2.new(0, 50, 0, 30)
+    DescLabel.Size = UDim2.new(1, -60, 0, 0)
+    DescLabel.Position = UDim2.new(0, 48, 0, 32)
     DescLabel.BackgroundTransparency = 1
     DescLabel.Text = msg
     DescLabel.TextColor3 = Color3.fromRGB(210, 210, 210)
-    DescLabel.Font = Settings.Font
+    DescLabel.Font = Enum.Font.Gotham
     DescLabel.TextSize = 12
     DescLabel.TextXAlignment = Enum.TextXAlignment.Left
     DescLabel.TextYAlignment = Enum.TextYAlignment.Top
@@ -106,41 +114,42 @@ local function Notify(title, msg, type, duration)
     TimeBar.BackgroundColor3 = accentColor
     TimeBar.BorderSizePixel = 0
     TimeBar.Parent = Notif
-    local targetHeight = math.max(65, DescLabel.TextBounds.Y + 45)
 
-    -- Animations
-    local function PlaySound()
-        local s = Instance.new("Sound")
-        s.SoundId = "rbxassetid://4590657391"
-        s.Volume = 0.5
-        s.Parent = CoreGui
-        s:Play()
-        Debris:AddItem(s, 2)
-    end
+    local Sound = Instance.new("Sound")
+    Sound.SoundId = "rbxassetid://4590657391"
+    Sound.Volume = 0.5
+    Sound.Parent = CoreGui
+    Sound:Play()
+    Debris:AddItem(Sound, 2)
 
-    PlaySound()
-    
-    TweenService:Create(Notif, TweenInfo.new(0.5, Enum.EasingStyle.Back), {
-        Size = UDim2.new(0, 300, 0, targetHeight)
-    }):Play()
+    task.spawn(function()
+        local targetHeight = math.max(70, DescLabel.TextBounds.Y + 45)
+        
+        TweenService:Create(Notif, TweenInfo.new(0.5, Enum.EasingStyle.Back), {
+            Size = UDim2.new(0, 300, 0, targetHeight)
+        }):Play()
 
-    TweenService:Create(TimeBar, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
-        Size = UDim2.new(0, 0, 0, 2)
-    }):Play()
-
-    task.delay(duration, function()
-        local slide = TweenService:Create(Notif, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
-            Position = UDim2.new(1.5, 0, 0, 0)
+        local barTween = TweenService:Create(TimeBar, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
+            Size = UDim2.new(0, 0, 0, 2)
         })
-        slide:Play()
-        slide.Completed:Connect(function()
-            local collapse = TweenService:Create(Notif, TweenInfo.new(0.3), {Size = UDim2.new(0, 300, 0, 0)})
-            collapse:Play()
-            collapse.Completed:Connect(function()
-                Notif:Destroy()
+        barTween:Play()
+
+        task.delay(duration, function()
+            local slide = TweenService:Create(Notif, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
+                Position = UDim2.new(1.5, 0, 0, 0),
+                BackgroundTransparency = 1
+            })
+            slide:Play()
+            
+            slide.Completed:Connect(function()
+                local collapse = TweenService:Create(Notif, TweenInfo.new(0.3), {Size = UDim2.new(0, 300, 0, 0)})
+                collapse:Play()
+                collapse.Completed:Connect(function()
+                    Notif:Destroy()
+                end)
             end)
         end)
     end)
 end
 
-return Notify
+return CreateNotification
