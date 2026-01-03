@@ -8,8 +8,7 @@ local Icons = {
     Error   = "rbxassetid://12809117197",
     Success = "rbxassetid://11021434503",
     Warning = "rbxassetid://13009511631",
-    Info    = "rbxassetid://11130383842",
-    Custom  = "rbxassetid://11130383842"
+    Info    = "rbxassetid://11130383842"
 }
 
 local Colors = {
@@ -17,7 +16,7 @@ local Colors = {
     Success = Color3.fromRGB(0, 255, 140),
     Warning = Color3.fromRGB(255, 180, 50),
     Info    = Color3.fromRGB(0, 190, 255),
-    Default = Color3.fromRGB(200, 200, 200)
+    Default = Color3.fromRGB(0, 190, 255)
 }
 
 local ScreenGui = Instance.new("ScreenGui")
@@ -40,10 +39,18 @@ UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 UIListLayout.Parent = Holder
 
-local function CreateNotification(title, msg, type, duration, customColor)
-    type = type or "Info"
+local function CreateNotification(title, msg, typeOrColor, duration)
+    local accentColor = Colors.Default
+    local iconId = Icons.Info
+
+    if typeof(typeOrColor) == "Color3" then
+        accentColor = typeOrColor
+    elseif typeof(typeOrColor) == "string" then
+        accentColor = Colors[typeOrColor] or Colors.Default
+        iconId = Icons[typeOrColor] or Icons.Info
+    end
+
     duration = duration or 5
-    local accentColor = (type == "Custom" and customColor) or Colors[type] or Colors.Default
     local IsClosing = false
     
     local Container = Instance.new("Frame")
@@ -90,7 +97,7 @@ local function CreateNotification(title, msg, type, duration, customColor)
     Icon.Size = UDim2.new(0.7, 0, 0.7, 0)
     Icon.Position = UDim2.new(0.15, 0, 0.15, 0)
     Icon.BackgroundTransparency = 1
-    Icon.Image = Icons[type] or Icons.Info
+    Icon.Image = iconId
     Icon.ImageColor3 = Color3.fromRGB(15, 15, 15)
     Icon.Parent = Circle
 
