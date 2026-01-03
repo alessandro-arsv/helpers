@@ -5,10 +5,10 @@ local CoreGui = game:GetService("CoreGui")
 local Debris = game:GetService("Debris")
 
 local Icons = {
-    Error   = "rbxassetid://11419713314",
-    Success = "rbxassetid://11419719547",
-    Warning = "rbxassetid://11419717430",
-    Info    = "rbxassetid://11419704339"
+    Error   = "rbxassetid://10734823862",
+    Success = "rbxassetid://10734941153",
+    Warning = "rbxassetid://10734983612",
+    Info    = "rbxassetid://10734812150"
 }
 
 local Colors = {
