@@ -16,7 +16,7 @@ local Colors = {
 }
 
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "LuauX_Fixed_Notifs"
+ScreenGui.Name = "alessandro-notifications"
 ScreenGui.Parent = CoreGui
 ScreenGui.DisplayOrder = 999
 
@@ -39,20 +39,18 @@ local function CreateNotification(title, msg, type, duration)
     duration = duration or 5
     local accentColor = Colors[type] or Colors.Default
     
-    -- Main Container (Invisible, used for UIListLayout spacing)
     local Container = Instance.new("Frame")
     Container.Name = "NotificationContainer"
-    Container.Size = UDim2.new(1, 0, 0, 0) -- Starts at 0 height to "push" others up
+    Container.Size = UDim2.new(1, 0, 0, 0)
     Container.BackgroundTransparency = 1
     Container.ClipsDescendants = false
-    Container.LayoutOrder = -os.clock() * 1000 -- Ensures newest is always at the bottom
+    Container.LayoutOrder = -os.clock() * 1000
     Container.Parent = Holder
 
-    -- The actual visible box
-    local Main = Instance.new("CanvasGroup") -- CanvasGroup allows smooth transparency fading of all children
+    local Main = Instance.new("CanvasGroup") 
     Main.Name = "Main"
     Main.Size = UDim2.new(1, 0, 0, 75)
-    Main.Position = UDim2.new(1.5, 0, 0, 0) -- Start off-screen (Right)
+    Main.Position = UDim2.new(1.5, 0, 0, 0)
     Main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
     Main.GroupTransparency = 1
     Main.BorderSizePixel = 0
@@ -68,7 +66,6 @@ local function CreateNotification(title, msg, type, duration)
     UIStroke.Transparency = 0.5
     UIStroke.Parent = Main
 
-    -- Content
     local Icon = Instance.new("ImageLabel")
     Icon.Size = UDim2.new(0, 26, 0, 26)
     Icon.Position = UDim2.new(0, 12, 0.5, -13)
