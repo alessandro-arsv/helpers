@@ -5,10 +5,11 @@ local CoreGui = game:GetService("CoreGui")
 local Debris = game:GetService("Debris")
 
 local Icons = {
-    Error   = "rbxassetid://10734823862",
-    Success = "rbxassetid://10734941153",
-    Warning = "rbxassetid://10734983612",
-    Info    = "rbxassetid://10734812150"
+    Error   = "rbxassetid://12809117197",
+    Success = "rbxassetid://11021434503",
+    Warning = "rbxassetid://13009511631",
+    Info    = "rbxassetid://11130383842",
+    Custom  = "rbxassetid://11130383842"
 }
 
 local Colors = {
@@ -16,33 +17,33 @@ local Colors = {
     Success = Color3.fromRGB(0, 255, 140),
     Warning = Color3.fromRGB(255, 180, 50),
     Info    = Color3.fromRGB(0, 190, 255),
-    Default = Color3.fromRGB(255, 255, 255)
+    Default = Color3.fromRGB(200, 200, 200)
 }
 
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "Modern_Notification_System"
-ScreenGui.ResetOnSpawn = false
+ScreenGui.Name = "alessandro-notifications"
+ScreenGui.Parent = CoreGui
 ScreenGui.DisplayOrder = 999
-pcall(function() ScreenGui.Parent = CoreGui end)
 
 local Holder = Instance.new("Frame")
-Holder.Name = "NotificationHolder"
-Holder.Size = UDim2.new(0, 320, 1, -40)
-Holder.Position = UDim2.new(1, -20, 1, -20)
+Holder.Name = "Holder"
+Holder.Size = UDim2.new(0, 310, 1, -20)
+Holder.Position = UDim2.new(1, -10, 1, -10)
 Holder.AnchorPoint = Vector2.new(1, 1)
 Holder.BackgroundTransparency = 1
 Holder.Parent = ScreenGui
 
 local UIListLayout = Instance.new("UIListLayout")
-UIListLayout.Padding = UDim.new(0, 12)
+UIListLayout.Padding = UDim.new(0, 10)
 UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
 UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 UIListLayout.Parent = Holder
 
-local function CreateNotification(title, msg, type, duration)
+local function CreateNotification(title, msg, type, duration, customColor)
+    type = type or "Info"
     duration = duration or 5
-    local accentColor = Colors[type] or Colors.Default
+    local accentColor = (type == "Custom" and customColor) or Colors[type] or Colors.Default
     local IsClosing = false
     
     local Container = Instance.new("Frame")
@@ -55,35 +56,47 @@ local function CreateNotification(title, msg, type, duration)
 
     local Main = Instance.new("CanvasGroup") 
     Main.Name = "Main"
-    Main.Size = UDim2.new(1, 0, 0, 80)
-    Main.Position = UDim2.new(1.3, 0, 0, 0)
-    Main.BackgroundColor3 = Color3.fromRGB(12, 12, 14)
-    Main.BackgroundTransparency = 0.05
+    Main.Size = UDim2.new(1, 0, 0, 75)
+    Main.Position = UDim2.new(1.5, 0, 0, 0)
+    Main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    Main.BackgroundTransparency = 0
     Main.GroupTransparency = 1
     Main.BorderSizePixel = 0
     Main.Parent = Container
 
     local UICorner = Instance.new("UICorner")
-    UICorner.CornerRadius = UDim.new(0, 12)
+    UICorner.CornerRadius = UDim.new(0, 8)
     UICorner.Parent = Main
 
     local UIStroke = Instance.new("UIStroke")
-    UIStroke.Thickness = 1.5
+    UIStroke.Thickness = 1.8
     UIStroke.Color = accentColor
-    UIStroke.Transparency = 0.4
+    UIStroke.Transparency = 0
     UIStroke.Parent = Main
 
+    local Circle = Instance.new("Frame")
+    Circle.Name = "Circle"
+    Circle.Size = UDim2.new(0, 26, 0, 26)
+    Circle.Position = UDim2.new(0, 12, 0.5, -13)
+    Circle.BackgroundColor3 = accentColor
+    Circle.BorderSizePixel = 0
+    Circle.Parent = Main
+
+    local CircleCorner = Instance.new("UICorner")
+    CircleCorner.CornerRadius = UDim.new(1, 0)
+    CircleCorner.Parent = Circle
+
     local Icon = Instance.new("ImageLabel")
-    Icon.Size = UDim2.new(0, 28, 0, 28)
-    Icon.Position = UDim2.new(0, 15, 0.5, -14)
+    Icon.Size = UDim2.new(0.7, 0, 0.7, 0)
+    Icon.Position = UDim2.new(0.15, 0, 0.15, 0)
     Icon.BackgroundTransparency = 1
     Icon.Image = Icons[type] or Icons.Info
-    Icon.ImageColor3 = accentColor
-    Icon.Parent = Main
+    Icon.ImageColor3 = Color3.fromRGB(15, 15, 15)
+    Icon.Parent = Circle
 
     local TitleLabel = Instance.new("TextLabel")
-    TitleLabel.Size = UDim2.new(1, -75, 0, 20)
-    TitleLabel.Position = UDim2.new(0, 55, 0, 15)
+    TitleLabel.Size = UDim2.new(1, -60, 0, 20)
+    TitleLabel.Position = UDim2.new(0, 50, 0, 12)
     TitleLabel.BackgroundTransparency = 1
     TitleLabel.Text = tostring(title):upper()
     TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -93,11 +106,11 @@ local function CreateNotification(title, msg, type, duration)
     TitleLabel.Parent = Main
 
     local DescLabel = Instance.new("TextLabel")
-    DescLabel.Size = UDim2.new(1, -75, 0, 32)
-    DescLabel.Position = UDim2.new(0, 55, 0, 35)
+    DescLabel.Size = UDim2.new(1, -60, 0, 30)
+    DescLabel.Position = UDim2.new(0, 50, 0, 32)
     DescLabel.BackgroundTransparency = 1
     DescLabel.Text = tostring(msg)
-    DescLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+    DescLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
     DescLabel.Font = Enum.Font.Gotham
     DescLabel.TextSize = 12
     DescLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -106,38 +119,21 @@ local function CreateNotification(title, msg, type, duration)
     DescLabel.RichText = true
     DescLabel.Parent = Main
 
-    local ProgressBarBG = Instance.new("Frame")
-    ProgressBarBG.Size = UDim2.new(1, -24, 0, 3)
-    ProgressBarBG.Position = UDim2.new(0, 12, 1, -10)
-    ProgressBarBG.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    ProgressBarBG.BackgroundTransparency = 0.9
-    ProgressBarBG.BorderSizePixel = 0
-    ProgressBarBG.Parent = Main
-
     local TimeBar = Instance.new("Frame")
-    TimeBar.Size = UDim2.new(1, 0, 1, 0)
+    TimeBar.Size = UDim2.new(1, 0, 0, 2)
+    TimeBar.Position = UDim2.new(0, 0, 1, -2)
     TimeBar.BackgroundColor3 = accentColor
     TimeBar.BorderSizePixel = 0
-    TimeBar.Parent = ProgressBarBG
-
-    local UICorner_BarBG = Instance.new("UICorner")
-    UICorner_BarBG.CornerRadius = UDim.new(1, 0)
-    UICorner_BarBG.Parent = ProgressBarBG
-    
-    local UICorner_Bar = Instance.new("UICorner")
-    UICorner_Bar.CornerRadius = UDim.new(1, 0)
-    UICorner_Bar.Parent = TimeBar
+    TimeBar.Parent = Main
 
     local function Dismiss()
         if IsClosing then return end
         IsClosing = true
-        
-        local exit = TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.In), {
-            Position = UDim2.new(1.3, 0, 0, 0),
+        local exit = TweenService:Create(Main, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.In), {
+            Position = UDim2.new(1.5, 0, 0, 0),
             GroupTransparency = 1
         })
         exit:Play()
-        
         exit.Completed:Connect(function()
             local collapse = TweenService:Create(Container, TweenInfo.new(0.3), {Size = UDim2.new(1, 0, 0, 0)})
             collapse:Play()
@@ -148,29 +144,30 @@ local function CreateNotification(title, msg, type, duration)
     end
 
     local CloseBtn = Instance.new("TextButton")
-    CloseBtn.Size = UDim2.new(0, 24, 0, 24)
-    CloseBtn.Position = UDim2.new(1, -30, 0, 10)
+    CloseBtn.Size = UDim2.new(0, 20, 0, 20)
+    CloseBtn.Position = UDim2.new(1, -25, 0, 8)
     CloseBtn.BackgroundTransparency = 1
     CloseBtn.Text = "×"
     CloseBtn.TextColor3 = Color3.fromRGB(100, 100, 100)
-    CloseBtn.TextSize = 22
+    CloseBtn.TextSize = 20
     CloseBtn.Font = Enum.Font.GothamBold
     CloseBtn.Parent = Main
     CloseBtn.MouseButton1Click:Connect(Dismiss)
 
-    TweenService:Create(Container, TweenInfo.new(0.4, Enum.EasingStyle.Quint), {Size = UDim2.new(1, 0, 0, 92)}):Play()
-    TweenService:Create(Main, TweenInfo.new(0.7, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+    TweenService:Create(Container, TweenInfo.new(0.4, Enum.EasingStyle.Quint), {Size = UDim2.new(1, 0, 0, 80)}):Play()
+    TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
         Position = UDim2.new(0, 0, 0, 0),
         GroupTransparency = 0
     }):Play()
     
     local s = Instance.new("Sound")
-    s.SoundId = "rbxassetid://6895079853"
-    s.Volume = 0.3
-    s.Parent = Main
+    s.SoundId = "rbxassetid://4590657391"
+    s.Volume = 0.5
+    s.Parent = CoreGui
     s:Play()
+    Debris:AddItem(s, 2)
 
-    TweenService:Create(TimeBar, TweenInfo.new(duration, Enum.EasingStyle.Linear), {Size = UDim2.new(0, 0, 1, 0)}):Play()
+    TweenService:Create(TimeBar, TweenInfo.new(duration, Enum.EasingStyle.Linear), {Size = UDim2.new(0, 0, 0, 2)}):Play()
 
     task.delay(duration, function()
         if not IsClosing then Dismiss() end
